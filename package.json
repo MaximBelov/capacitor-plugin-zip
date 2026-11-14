@@ -1,5 +1,6 @@
 {
   "name": "capacitor-plugin-zip",
+  "private": true,
   "version": "0.0.1",
   "description": "Unzip archives from a Capacitor app on iOS and Android",
   "main": "dist/plugin.cjs.js",
