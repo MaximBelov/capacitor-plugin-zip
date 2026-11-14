@@ -11,7 +11,6 @@
     "android/build.gradle",
     "dist/",
     "ios/Sources",
-    "ios/Tests",
     "Package.swift",
     "CapacitorPluginZip.podspec"
   ],
@@ -27,7 +26,10 @@
   "keywords": [
     "capacitor",
     "plugin",
-    "native"
+    "native",
+    "zip",
+    "unzip",
+    "archive"
   ],
   "scripts": {
     "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
@@ -43,7 +45,10 @@
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "test:android": "cd android && ./gradlew test",
+    "test:ios": "xcodebuild test -scheme CapacitorPluginZip -destination \"platform=iOS Simulator,name=${IOS_SIMULATOR:-iPhone 17}\" -quiet"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",
@@ -59,7 +64,8 @@
     "rimraf": "^6.1.0",
     "rollup": "^4.53.2",
     "swiftlint": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "@capacitor/core": ">=8.0.0"

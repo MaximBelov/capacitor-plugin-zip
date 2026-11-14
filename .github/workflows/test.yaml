@@ -1,0 +1,27 @@
+name: Tests
+# The TypeScript: lint, build and the Vitest unit tests. Called by ci.yaml, for every pull request and every push to main.
+on:
+  workflow_call:
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run eslint
+      - run: npm run prettier -- --check
+      # The API section of the README is generated from src/definitions.ts by the build. A change to the definitions that was not
+      # built would publish a README that describes the old API: this catches it in the pull request.
+      - name: The README's API section is the one the source generates
+        run: |
+          npm run build
+          if [ -n "$(git status --porcelain -- README.md)" ]; then
+            git diff -- README.md
+            echo "README.md is not what docgen generates from src/definitions.ts: run npm run build and commit the result"
+            exit 1
+          fi
+      - run: npm test

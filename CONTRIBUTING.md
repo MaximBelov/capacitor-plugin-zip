@@ -41,12 +41,18 @@ Check formatting and code quality, autoformat/autofix if possible.
 
 This template is integrated with ESLint, Prettier, and SwiftLint. Using these tools is completely optional, but the [Capacitor Community](https://github.com/capacitor-community/) strives to have consistent code style and structure for easier cooperation.
 
-## Publishing
-
-There is a `prepublishOnly` hook in `package.json` which prepares the plugin before publishing, so all you need to do is run:
+## Testing
 
 ```shell
-npm publish
+npm test               # TypeScript (Vitest)
+npm run test:android   # Kotlin on the JVM (JUnit); needs JDK 21 and the Android SDK
+npm run test:ios       # Swift with XCTest on a simulator; IOS_SIMULATOR picks one (default "iPhone 17")
 ```
+
+## Publishing
+
+Releases are published by CI, not from a laptop: bump `version` in `package.json` in a pull request, and when it is merged to `main`,
+`.github/workflows/ci.yaml` builds the package and publishes it to npm through trusted publishing. A merge that keeps the version
+publishes nothing.
 
 > **Note**: The [`files`](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files) array in `package.json` specifies which files get published. If you rename files/directories or add files elsewhere, you may need to update it.

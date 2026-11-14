@@ -1,23 +1,44 @@
 import Foundation
 import Capacitor
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
 @objc(ZipPlugin)
 public class ZipPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "ZipPlugin"
     public let jsName = "Zip"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "unzip", returnType: CAPPluginReturnPromise)
     ]
-    private let implementation = Zip()
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
+    @objc func unzip(_ call: CAPPluginCall) {
+        let destinationArg = call.getString("destination")
+        let overwrite = call.getBool("overwrite", true)
+        let source: URL
+        let destination: URL
+        do {
+            source = try Unzipper.resolve(call.getString("source"), name: "source")
+            destination = try Unzipper.resolve(destinationArg, name: "destination")
+        } catch let error as UnzipError {
+            call.reject(error.message, error.code)
+            return
+        } catch {
+            call.reject(error.localizedDescription, "INVALID_ARGUMENT")
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                let count = try Unzipper.unzip(source: source, destination: destination, overwrite: overwrite) { loaded, total in
+                    self?.notifyListeners("progress", data: [
+                        "destination": destinationArg ?? "",
+                        "loaded": loaded,
+                        "total": total
+                    ])
+                }
+                call.resolve(["entries": count])
+            } catch let error as UnzipError {
+                call.reject(error.message, error.code)
+            } catch {
+                call.reject("Could not unzip \(source.path): \(error.localizedDescription)", "IO", error)
+            }
+        }
     }
 }

@@ -11,14 +11,17 @@
   </head>
   <body>
     <main>
-      <h1>Capacitor Test Plugin Project</h1>
+      <h1>capacitor-plugin-zip</h1>
       <p>
         This project can be used to test out the functionality of your plugin. Nothing in the
         <em>example-app/</em> folder will be published to npm when using this template, so you can create away!
       </p>
-      <label for="echoInput">Echo Text:</label>
-      <input type="text" id="echoInput" name="echoInput" value="Hello World!" />
-      <button onclick="testEcho()">Click Me!</button>
+      <label for="source">Archive (absolute path or file:// URL):</label>
+      <input type="text" id="source" name="source" />
+      <label for="destination">Destination directory:</label>
+      <input type="text" id="destination" name="destination" />
+      <button onclick="testUnzip()">Unzip</button>
+      <p id="output" role="status"></p>
     </main>
 
     <script src="./js/example.js" type="module"></script>

@@ -1,6 +1,16 @@
-import { Zip } from 'capacitor-plugin-zip';
+import { unzip } from 'capacitor-plugin-zip';
 
-window.testEcho = () => {
-    const inputValue = document.getElementById("echoInput").value;
-    Zip.echo({ value: inputValue })
-}
+window.testUnzip = async () => {
+  const source = document.getElementById('source').value;
+  const destination = document.getElementById('destination').value;
+  const output = document.getElementById('output');
+  output.textContent = 'Extracting...';
+  try {
+    const { entries } = await unzip({ source, destination }, ({ loaded, total }) => {
+      output.textContent = `${loaded} of ${total}`;
+    });
+    output.textContent = `Done: ${entries} entries`;
+  } catch (error) {
+    output.textContent = `Failed (${error.code}): ${error.message}`;
+  }
+};

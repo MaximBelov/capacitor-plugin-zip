@@ -1,0 +1,44 @@
+# Weekly updates for everything this repository depends on. Dependabot reads this file from the default branch only.
+#
+# Swift is not here: the ZIPFoundation pin is exact in Package.swift and in the podspec, which Dependabot does not read, so
+# .github/workflows/pins.yaml compares it with the latest release instead.
+version: 2
+
+updates:
+  # the workflows in .github/workflows
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
+    labels: [dependencies]
+
+  # the plugin's dev dependencies: Capacitor, the build and lint tools, Vitest
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      capacitor:
+        patterns: ['@capacitor/*']
+        update-types: [minor, patch]
+    labels: [dependencies]
+
+  # the Android build: the Android Gradle plugin, Kotlin, AndroidX, JUnit
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      android:
+        patterns: ['*']
+        update-types: [minor, patch]
+    labels: [dependencies]

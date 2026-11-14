@@ -1,10 +1,9 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { ZipPlugin } from './definitions';
+import type { UnzipOptions, UnzipResult, ZipPlugin } from './definitions';
 
 export class ZipWeb extends WebPlugin implements ZipPlugin {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  async unzip(options: UnzipOptions): Promise<UnzipResult> {
+    throw this.unimplemented(`Cannot unzip ${options.source} on the web: it needs the native file system.`);
   }
 }

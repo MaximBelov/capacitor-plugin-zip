@@ -1,0 +1,32 @@
+name: iOS tests
+# The Swift of ios/ on an iOS simulator: the XCTest suite extracting the archives in test/fixtures, and a build of the Swift package
+# for a device, the way an app builds it. No phone and no signing. Called by ci.yaml when something it covers changes, and for every
+# push to main.
+on:
+  workflow_call:
+# macos-26: Capacitor 8 and its Swift package want Xcode 26, which is what an app needs too.
+jobs:
+  xctest:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci
+      # The simulator the tests run on: the newest iPhone the runner's Xcode has, so a new runner image does not break the job.
+      - name: Pick a simulator
+        run: |
+          name=$(xcrun simctl list devices available --json \
+            | node -e 'const d=JSON.parse(require("fs").readFileSync(0)).devices; const n=Object.entries(d).filter(([r])=>r.includes("iOS")).flatMap(([,l])=>l).map(x=>x.name).filter(x=>/^iPhone \d+$/.test(x)).sort((a,b)=>Number(a.split(" ")[1])-Number(b.split(" ")[1])); console.log(n.at(-1)||"")')
+          echo "IOS_SIMULATOR=$name" >> "$GITHUB_ENV"
+          echo "simulator: $name"
+      - run: npm run test:ios
+      - run: npm run verify:ios
+      # A cancelled run leaves xcodebuild and the simulator running, which slows the runner's own clean-up for minutes.
+      - name: Stop what the tests left running
+        if: always()
+        run: |
+          pkill -f '[x]codebuild' || true
+          xcrun simctl shutdown all || true
