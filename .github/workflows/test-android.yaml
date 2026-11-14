@@ -14,11 +14,11 @@ jobs:
         with:
           node-version: 24
       # Capacitor 8's Android project compiles for Java 21
-      - uses: actions/setup-java@v6.0.1
+      - uses: actions/setup-java@v6.2.0
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v6.4.0
+      - uses: gradle/actions/setup-gradle@v6.4.1
       # settings.gradle takes :capacitor-android from node_modules/@capacitor/android
       - run: npm ci
       - run: npm run verify:android
